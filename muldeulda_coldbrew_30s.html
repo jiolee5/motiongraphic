@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>물들다 냉침차 30s</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;500;900&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+/* ===== 이미지 교체: 웹사이트 제품 이미지 URL을 넣으면 병 일러스트 대신 사용됩니다 ===== */
+:root{
+  --ice:#EAF7F4; --deep:#0D3B35; --mint:#7FD8BE; --sky:#CDEFF5;
+  --hibiscus:#FF5A7A; --amber:#E9A75B; --white:#ffffff;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;background:#071f1c;overflow:hidden}
+#stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform-origin:center;overflow:hidden;
+  background:var(--ice);font-family:'Noto Sans KR',sans-serif;color:var(--deep)}
+.bg{position:absolute;inset:0}
+#bgGrad{background:radial-gradient(1200px 800px at 75% 30%, #ffffff 0%, var(--sky) 45%, var(--ice) 100%)}
+#bgTint{opacity:0}
+.grain{position:absolute;inset:0;opacity:.07;pointer-events:none;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+.scene{position:absolute;inset:0;opacity:0}
+.char{display:inline-block;will-change:transform}
+.big{font-weight:900;font-size:300px;letter-spacing:-0.05em;line-height:1}
+.serif{font-family:'Instrument Serif',serif;font-style:italic;font-weight:400}
+.mono{font-family:'Space Grotesk',sans-serif}
+/* frame UI */
+.ui{position:absolute;font-family:'Space Grotesk',sans-serif;font-size:22px;letter-spacing:.18em;text-transform:uppercase;z-index:50;opacity:0}
+#uiTL{left:64px;top:52px;font-weight:700}
+#uiTR{right:64px;top:52px;text-align:right}
+#uiBL{left:64px;bottom:52px}
+#uiBR{right:64px;bottom:52px}
+.ui.light{color:#fff}
+/* S1 */
+#water{position:absolute;left:0;right:0;bottom:0;height:400px;
+  background:linear-gradient(180deg,rgba(127,216,190,.35),rgba(127,216,190,.75));backdrop-filter:blur(2px)}
+#water::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:rgba(255,255,255,.9)}
+#ice{position:absolute;left:50%;top:0;width:230px;height:230px;margin-left:-115px;border-radius:44px;
+  background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(205,239,245,.55) 45%,rgba(255,255,255,.25));
+  border:3px solid rgba(255,255,255,.95);box-shadow:inset -20px -20px 50px rgba(127,216,190,.5),0 40px 80px rgba(13,59,53,.18)}
+#ice::after{content:"";position:absolute;left:28px;top:24px;width:70px;height:22px;border-radius:20px;background:rgba(255,255,255,.95);transform:rotate(-20deg)}
+.ripple{position:absolute;left:50%;top:680px;width:200px;height:50px;margin-left:-100px;margin-top:-25px;border:3px solid #fff;border-radius:50%;opacity:0}
+#s1text{position:absolute;left:0;right:0;top:170px;text-align:center}
+.sub{font-size:34px;font-weight:300;letter-spacing:.02em}
+/* bottle */
+#bottleWrap{position:absolute;left:1180px;top:150px;width:330px;height:770px;z-index:20;opacity:0}
+#bottleWrap svg{width:100%;height:100%;overflow:visible}
+#bottleImg{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:none}
+/* S2 */
+#s2text{position:absolute;left:180px;top:300px}
+.leaf{position:absolute;width:46px;height:22px;border-radius:0 100% 0 100%;background:var(--deep);opacity:0;z-index:25}
+/* S3 */
+#s3text{position:absolute;left:0;right:0;top:330px;text-align:center}
+.pill{position:absolute;padding:20px 40px;border-radius:999px;background:#fff;font-size:40px;font-weight:500;
+  box-shadow:0 20px 50px rgba(13,59,53,.12);opacity:0}
+/* S4 */
+.marquee{position:absolute;left:0;white-space:nowrap;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:240px;letter-spacing:-.04em;line-height:1}
+#mq1{top:40px;color:transparent;-webkit-text-stroke:3px var(--deep)}
+#mq2{bottom:40px;color:var(--deep)}
+#counterBox{position:absolute;left:0;right:0;top:300px;text-align:center}
+#counter{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:420px;line-height:1;letter-spacing:-.06em}
+#counterUnit{font-size:120px}
+#counterCap{font-size:48px;font-weight:500;margin-top:10px}
+.stat{position:absolute;left:0;right:0;top:330px;text-align:center;opacity:0}
+.stat .num{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:360px;line-height:1;letter-spacing:-.06em}
+.stat .cap{font-size:48px;font-weight:500}
+/* S5 */
+#flavLeft{position:absolute;left:150px;top:360px;width:900px}
+.flav{position:absolute;left:0;top:0;opacity:0}
+.flav .en{font-size:200px;line-height:.9}
+.flav .ko{font-size:44px;font-weight:500;margin-top:30px}
+#flavIdx{position:absolute;right:90px;top:470px;font-family:'Space Grotesk',sans-serif;font-size:24px;letter-spacing:.2em;text-align:right;line-height:1.8}
+#s5 #flavIdx{right:auto;left:150px;top:auto;bottom:170px;text-align:left}
+/* S6 */
+#endLogo{position:absolute;left:0;right:0;top:250px;text-align:center;color:#fff}
+#logo{font-size:240px;font-weight:900;letter-spacing:-.06em;line-height:1}
+#logoSub{font-family:'Space Grotesk',sans-serif;font-size:30px;letter-spacing:.6em;margin-top:24px;padding-left:.6em}
+#slogan{font-size:72px;font-weight:300;margin-top:70px;letter-spacing:-.01em}
+#slogan b{font-weight:900}
+#cta{position:absolute;left:0;right:0;bottom:120px;text-align:center;color:rgba(255,255,255,.85);font-size:30px;letter-spacing:.08em}
+.bubble{position:absolute;border-radius:50%;border:2px solid rgba(255,255,255,.6);opacity:0}
+/* subtitles */
+#subtitle{position:absolute;left:0;right:0;bottom:180px;text-align:center;z-index:60;font-size:0}
+/* overlay */
+#overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:22px;
+  background:rgba(7,31,28,.72);backdrop-filter:blur(10px);z-index:100;color:#fff;font-family:'Noto Sans KR',sans-serif;cursor:pointer}
+#overlay .play{width:120px;height:120px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center}
+#overlay .play::after{content:"";border-left:36px solid #0D3B35;border-top:22px solid transparent;border-bottom:22px solid transparent;margin-left:10px}
+#overlay p{font-size:16px;opacity:.8;letter-spacing:.06em;text-align:center;padding:0 16px}
+#bar{position:fixed;left:0;bottom:0;height:4px;width:0;background:var(--mint);z-index:90}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="bg" id="bgGrad"></div>
+  <div class="bg" id="bgTint"></div>
+
+  <!-- frame UI -->
+  <div class="ui" id="uiTL">MULDEULDA®</div>
+  <div class="ui" id="uiTR">Cold Brew Tea<br>Collection 2026</div>
+  <div class="ui" id="uiBL"><span id="tc">00:00</span> / 00:30</div>
+  <div class="ui" id="uiBR">Steeped 8H · 0 kcal</div>
+
+  <!-- S1: 차갑게 -->
+  <div class="scene" id="s1">
+    <div id="water"></div>
+    <div class="ripple"></div><div class="ripple"></div><div class="ripple"></div>
+    <div id="ice"></div>
+    <div id="s1text">
+      <div class="big split" id="t1">차갑게.</div>
+      <div class="sub" style="margin-top:28px" id="t1s">찬물에 담그는 순간부터</div>
+    </div>
+  </div>
+
+  <!-- S2: 천천히 -->
+  <div class="scene" id="s2">
+    <div id="s2text">
+      <div class="serif" style="font-size:64px" id="t2e">slowly, for eight hours</div>
+      <div class="big split" id="t2">천천히.</div>
+      <div class="sub" style="margin-top:28px" id="t2s">8시간, 찻잎이 스스로 우러나는 시간</div>
+    </div>
+  </div>
+
+  <!-- S3: 나답게 -->
+  <div class="scene" id="s3">
+    <div id="s3text">
+      <div class="big split" id="t3" style="font-size:340px">나답게.</div>
+    </div>
+    <div class="pill" style="left:220px;top:180px">#웰니스루틴</div>
+    <div class="pill" style="right:240px;top:230px">#카페인프리</div>
+    <div class="pill" style="left:330px;bottom:170px">#무설탕</div>
+    <div class="pill" style="right:300px;bottom:200px">#갓생보틀</div>
+  </div>
+
+  <!-- S4: kinetic stats -->
+  <div class="scene" id="s4">
+    <div class="marquee" id="mq1">COLD BREW · COLD BREW · COLD BREW · COLD BREW ·</div>
+    <div class="marquee" id="mq2">SLOW STEEP · SLOW STEEP · SLOW STEEP · SLOW STEEP ·</div>
+    <div id="counterBox">
+      <div><span id="counter">0</span><span id="counterUnit" class="mono" style="font-weight:700">H</span></div>
+      <div id="counterCap">찬물에서 8시간</div>
+    </div>
+    <div class="stat" id="stat1"><div class="num">0<span style="font-size:120px">kcal</span></div><div class="cap">가볍게, 부담 없이</div></div>
+    <div class="stat" id="stat2"><div class="num" style="font-size:300px">NO SUGAR</div><div class="cap">본연의 단맛 그대로</div></div>
+  </div>
+
+  <!-- S5: flavors -->
+  <div class="scene" id="s5">
+    <div id="flavLeft">
+      <div class="flav" id="f1"><div class="en serif">Hibiscus</div><div class="ko">히비스커스 · 새콤한 핑크 무드</div></div>
+      <div class="flav" id="f2"><div class="en serif">Peppermint</div><div class="ko">페퍼민트 · 머리까지 맑아지는</div></div>
+      <div class="flav" id="f3"><div class="en serif">Earl Grey</div><div class="ko">얼그레이 · 은은한 베르가못</div></div>
+    </div>
+    <div id="flavIdx"><span id="fi1">01 — HIBISCUS</span><br><span id="fi2">02 — PEPPERMINT</span><br><span id="fi3">03 — EARL GREY</span></div>
+  </div>
+
+  <!-- S6: end card -->
+  <div class="scene" id="s6">
+    <div id="bubbles"></div>
+    <div id="endLogo">
+      <div id="logo" class="split">물들다</div>
+      <div id="logoSub">COLD BREW TEA</div>
+      <div id="slogan"><span class="sw">차갑게,</span> <span class="sw">천천히,</span> <span class="sw"><b>나답게.</b></span></div>
+    </div>
+    <div id="cta">하루 한 병, 나를 물들이는 시간 — @muldeulda</div>
+  </div>
+
+  <!-- bottle (shared) -->
+  <div id="bottleWrap">
+    <svg viewBox="0 0 300 700">
+      <defs>
+        <clipPath id="bclip"><path id="bpath" d="M115 60 h70 v80 q0 30 40 70 q35 35 35 85 v335 q0 40 -40 40 h-140 q-40 0 -40 -40 v-335 q0 -50 35 -85 q40 -40 40 -70 z"/></clipPath>
+        <linearGradient id="liq" x1="0" y1="0" x2="0" y2="1">
+          <stop id="lq1" offset="0" style="stop-color:#F3C27A"/>
+          <stop id="lq2" offset="1" style="stop-color:#B8661F"/>
+        </linearGradient>
+        <linearGradient id="glass" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#fff" stop-opacity=".55"/>
+          <stop offset=".5" stop-color="#fff" stop-opacity=".12"/>
+          <stop offset="1" stop-color="#fff" stop-opacity=".45"/>
+        </linearGradient>
+      </defs>
+      <ellipse cx="150" cy="690" rx="130" ry="16" fill="#0D3B35" opacity=".12"/>
+      <g clip-path="url(#bclip)">
+        <rect x="0" y="0" width="300" height="700" fill="url(#glass)"/>
+        <rect id="liquid" x="0" y="700" width="300" height="700" fill="url(#liq)" opacity=".92"/>
+        <g id="bubblesIn" fill="#fff" opacity=".6">
+          <circle cx="110" cy="600" r="6"/><circle cx="180" cy="520" r="4"/><circle cx="150" cy="430" r="5"/><circle cx="200" cy="620" r="3"/>
+        </g>
+      </g>
+      <use href="#bpath" fill="none" stroke="#fff" stroke-width="5"/>
+      <rect x="40" y="370" width="220" height="190" rx="10" fill="#fff" opacity=".93"/>
+      <text x="150" y="450" text-anchor="middle" font-family="Noto Sans KR" font-weight="900" font-size="54" fill="#0D3B35" letter-spacing="-2">물들다</text>
+      <text x="150" y="490" text-anchor="middle" font-family="Space Grotesk" font-size="15" fill="#0D3B35" letter-spacing="4">COLD BREW TEA</text>
+      <text id="labelFlav" x="150" y="530" text-anchor="middle" font-family="Instrument Serif" font-style="italic" font-size="26" fill="#0D3B35">Earl Grey</text>
+      <rect x="108" y="10" width="84" height="60" rx="12" fill="#0D3B35"/>
+      <rect x="62" y="230" width="12" height="380" rx="6" fill="#fff" opacity=".55"/>
+    </svg>
+    <img id="bottleImg" alt="">
+  </div>
+</div>
+
+<div id="bar"></div>
+<div id="overlay">
+  <div class="play"></div>
+  <div style="font-size:22px;font-weight:500">물들다 냉침차 · 30s Brand Film</div>
+  <p>클릭하면 음악·내레이션과 함께 재생됩니다 (소리를 켜주세요)</p>
+</div>
+
+<script>
+/* ============ 설정: 웹사이트 이미지를 쓰려면 아래 URL을 넣으세요 ============ */
+const CONFIG = {
+  productImage: '',          // 예: 'https://브랜드사이트/product.png' (배경 투명 PNG 권장)
+  slogan: '차갑게, 천천히, 나답게. 물들다, 냉침차.'
+};
+
+/* ---------- stage scale ---------- */
+const stage = document.getElementById('stage');
+function fit(){ const s = Math.min(innerWidth/1920, innerHeight/1080); stage.style.transform = `translate(-50%,-50%) scale(${s})`; }
+addEventListener('resize', fit); fit();
+
+if (CONFIG.productImage){
+  const img = document.getElementById('bottleImg'); img.src = CONFIG.productImage; img.style.display='block';
+  document.querySelector('#bottleWrap svg').style.display='none';
+}
+
+/* ---------- split text ---------- */
+document.querySelectorAll('.split').forEach(el=>{
+  el.innerHTML = [...el.textContent].map(c=>`<span class="char">${c===' '?'&nbsp;':c}</span>`).join('');
+});
+const chars = id => document.querySelectorAll(`#${id} .char`);
+
+/* ---------- leaves & bubbles ---------- */
+const leaves=[];
+for(let i=0;i<9;i++){ const l=document.createElement('div'); l.className='leaf';
+  l.style.left=(1230+Math.random()*230)+'px'; l.style.top='-60px';
+  l.style.background=i%2?'#3E7D4E':'#5E9C5A'; stage.appendChild(l); leaves.push(l); }
+const bwrap=document.getElementById('bubbles');
+for(let i=0;i<22;i++){ const b=document.createElement('div'); b.className='bubble'; const s=12+Math.random()*50;
+  b.style.width=b.style.height=s+'px'; b.style.left=Math.random()*1920+'px'; b.style.top=(1100+Math.random()*200)+'px'; bwrap.appendChild(b); }
+
+/* ---------- timeline ---------- */
+const tl = gsap.timeline({paused:true, onUpdate(){
+  const t=tl.time(); document.getElementById('tc').textContent='00:'+String(Math.floor(t)).padStart(2,'0');
+  document.getElementById('bar').style.width=(t/30*100)+'%';
+}});
+const E='expo.out', P='power3.inOut';
+
+// UI frame in
+tl.to('.ui',{opacity:1,duration:.8,stagger:.08},0.2);
+
+// S1 0 – 4.5  차갑게
+tl.set('#s1',{opacity:1},0)
+  .from('#water',{yPercent:100,duration:1.2,ease:E},0)
+  .fromTo('#ice',{y:-320,rotation:-25},{y:430,rotation:12,duration:.9,ease:'power2.in'},0.15)
+  .to('#ice',{y:520,rotation:18,duration:1.6,ease:'elastic.out(1,.4)'},1.05)
+  .fromTo('.ripple',{scale:.3,opacity:.9},{scale:5,opacity:0,duration:1.8,stagger:.18,ease:'power2.out'},1.0)
+  .to('#stage',{keyframes:{x:[0,-6,5,-3,0]},duration:.3},1.0)
+  .from(chars('t1'),{yPercent:120,opacity:0,rotationX:-90,duration:.9,stagger:.07,ease:E},1.15)
+  .from('#t1s',{y:30,opacity:0,duration:.8,ease:E},1.7)
+  .to(chars('t1'),{letterSpacing:'0.02em',duration:2,ease:'none'},2.0)
+  .to('#s1text',{y:-120,opacity:0,duration:.6,ease:'power2.in'},4.0)
+  .to('#water',{yPercent:100,duration:.7,ease:P},4.0)
+  .to('#ice',{y:1200,duration:.6,ease:'power2.in'},4.0)
+  .set('#s1',{opacity:0},4.6);
+
+// S2 4.5 – 9  천천히 (bottle + steeping)
+tl.set('#s2',{opacity:1},4.4)
+  .fromTo('#bottleWrap',{opacity:0,y:200,rotation:8},{opacity:1,y:0,rotation:0,duration:1.1,ease:E},4.4)
+  .set('#lq1',{stopColor:'#E6F6F2'},4.4).set('#lq2',{stopColor:'#CFEDE6'},4.4)
+  .fromTo('#liquid',{attr:{y:700}},{attr:{y:220},duration:1.4,ease:P},4.7)
+  .from('#t2e',{x:-80,opacity:0,duration:.9,ease:E},4.7)
+  .from(chars('t2'),{opacity:0,filter:'blur(30px)',x:60,duration:1.4,stagger:.16,ease:'power2.out'},4.9)
+  .from('#t2s',{y:30,opacity:0,duration:.8,ease:E},5.6);
+leaves.forEach((l,i)=>{
+  tl.fromTo(l,{y:0,opacity:0,rotation:Math.random()*180},{y:820+Math.random()*80,opacity:.95,rotation:'+=240',x:(Math.random()-.5)*120,duration:2.8,ease:'sine.inOut'},5.0+i*.12)
+    .to(l,{opacity:0,duration:.6},7.9+i*.05);
+});
+tl.to('#lq1',{stopColor:'#F3C27A',duration:3,ease:'sine.inOut'},5.6)
+  .to('#lq2',{stopColor:'#B8661F',duration:3,ease:'sine.inOut'},5.6)
+  .to('#bgGrad',{filter:'hue-rotate(-12deg) saturate(1.1)',duration:3},5.6)
+  .to('#s2text',{x:-120,opacity:0,duration:.6,ease:'power2.in'},8.5)
+  .to('#bottleWrap',{y:-60,scale:.6,opacity:0,duration:.6,ease:'power2.in'},8.5)
+  .set('#s2',{opacity:0},9.1);
+
+// S3 9 – 12.5  나답게
+tl.set('#s3',{opacity:1},9.0)
+  .to('#bgTint',{opacity:1,background:'#7FD8BE',duration:.01},9.0)
+  .from(chars('t3'),{scale:0,rotation:()=>gsap.utils.random(-40,40),opacity:0,duration:.8,stagger:.08,ease:'back.out(2.2)'},9.05)
+  .from('.pill',{scale:0,opacity:0,duration:.7,stagger:.15,ease:'back.out(2)'},9.6)
+  .to('.pill',{y:'-=30',duration:2.4,ease:'sine.inOut',stagger:.1},10.2)
+  .to(chars('t3'),{color:'#ffffff',duration:.25,stagger:.05},10.8)
+  .to('#bgTint',{background:'#0D3B35',duration:.35},10.8)
+  .to('.ui',{color:'#fff',duration:.3},10.8)
+  .to('.pill',{scale:0,opacity:0,duration:.4,stagger:.05,ease:'power2.in'},12.0)
+  .to(chars('t3'),{yPercent:-130,opacity:0,duration:.5,stagger:.04,ease:'power2.in'},12.0)
+  .set('#s3',{opacity:0},12.6);
+
+// S4 12.5 – 18.5 kinetic stats
+tl.set('#s4',{opacity:1},12.4)
+  .to('#bgTint',{background:'#EAF7F4',duration:.4},12.4)
+  .to('.ui',{color:'#0D3B35',duration:.3},12.4)
+  .fromTo('#mq1',{x:0},{x:-1400,duration:6.2,ease:'none'},12.4)
+  .fromTo('#mq2',{x:-1600},{x:-200,duration:6.2,ease:'none'},12.4)
+  .from('#mq1,#mq2',{opacity:0,duration:.5},12.4)
+  .from('#counterBox',{scale:.6,opacity:0,duration:.6,ease:E},12.6)
+  .to({v:0},{v:8,duration:1.3,ease:'power2.out',onUpdate(){document.getElementById('counter').textContent=Math.round(this.targets()[0].v)}},12.7)
+  .to('#counterBox',{yPercent:-60,opacity:0,duration:.45,ease:'power2.in'},14.6)
+  .fromTo('#stat1',{yPercent:60,opacity:0},{yPercent:0,opacity:1,duration:.55,ease:E},14.95)
+  .to('#stat1',{yPercent:-60,opacity:0,duration:.45,ease:'power2.in'},16.3)
+  .fromTo('#stat2',{scale:1.6,opacity:0},{scale:1,opacity:1,duration:.6,ease:E},16.65)
+  .to('#stat2 .num',{letterSpacing:'0.02em',duration:1.4,ease:'none'},16.8)
+  .to('#s4',{opacity:0,duration:.4},18.2);
+
+// S5 18.5 – 24 flavors
+const flav=[
+  {id:'f1',top:'#FFC2CE',bot:'#E2365C',bg:'#FFE4EA',name:'Hibiscus',idx:'#fi1'},
+  {id:'f2',top:'#CFF5E6',bot:'#3DBE95',bg:'#E2F8F0',name:'Peppermint',idx:'#fi2'},
+  {id:'f3',top:'#F7D59E',bot:'#B8661F',bg:'#FBF0DF',name:'Earl Grey',idx:'#fi3'}];
+tl.set('#s5',{opacity:1},18.5)
+  .set('#flavIdx span',{opacity:.3},18.5)
+  .fromTo('#bottleWrap',{left:1180,opacity:0,scale:.8,y:120,rotation:0},{opacity:1,scale:1,y:0,duration:.8,ease:E},18.5);
+flav.forEach((f,i)=>{
+  const t=18.6+i*1.8;
+  tl.to('#bgTint',{background:f.bg,duration:.5},t)
+    .to('#lq1',{stopColor:f.top,duration:.6},t).to('#lq2',{stopColor:f.bot,duration:.6},t)
+    .set('#labelFlav',{textContent:f.name},t+.2)
+    .fromTo('#bottleWrap',{rotation:i%2?-6:6},{rotation:0,duration:.9,ease:'elastic.out(1,.5)'},t)
+    .fromTo('#'+f.id,{opacity:0,y:80,clipPath:'inset(100% 0 0 0)'},{opacity:1,y:0,clipPath:'inset(0% 0 0 0)',duration:.7,ease:E},t)
+    .to(f.idx,{opacity:1,duration:.3},t);
+  if(i<2) tl.to('#'+f.id,{opacity:0,y:-60,duration:.35,ease:'power2.in'},t+1.45).to(f.idx,{opacity:.3,duration:.3},t+1.45);
+});
+tl.to('#flavLeft,#flavIdx',{opacity:0,duration:.4},23.6)
+  .to('#bottleWrap',{left:1500,scale:.5,y:220,opacity:0,duration:.6,ease:'power2.in'},23.6)
+  .set('#s5',{opacity:0},24.1);
+
+// S6 24 – 30 end card
+tl.set('#s6',{opacity:1},24.0)
+  .to('#bgTint',{background:'#0D3B35',duration:.5},23.9)
+  .to('.ui',{color:'#fff',duration:.3},23.9)
+  .from(chars('logo'),{yPercent:100,opacity:0,duration:1,stagger:.1,ease:E},24.2)
+  .from('#logoSub',{letterSpacing:'1.4em',opacity:0,duration:1.4,ease:E},24.6)
+  .from('#slogan .sw',{y:40,opacity:0,filter:'blur(12px)',duration:.8,stagger:.55,ease:E},25.2)
+  .from('#cta',{opacity:0,y:20,duration:.8},27.0)
+  .to('.bubble',{y:-1400,opacity:.8,duration:()=>gsap.utils.random(3,5.5),stagger:.08,ease:'none'},24.1)
+  .to('#logo',{scale:1.04,duration:5,ease:'none'},24.5)
+  .to('#stage',{opacity:0,duration:.5},29.5);
+
+/* ---------- audio: original lo-fi wellness BGM (Web Audio) ---------- */
+let ac;
+function startAudio(){
+  ac = new (window.AudioContext||window.webkitAudioContext)();
+  const t0 = ac.currentTime + .08;
+  const master = ac.createGain(); master.connect(ac.destination);
+  const g = master.gain;
+  g.setValueAtTime(0,t0); g.linearRampToValueAtTime(.85,t0+1.2);
+  g.setValueAtTime(.85,t0+24.4); g.linearRampToValueAtTime(.32,t0+25); g.setValueAtTime(.32,t0+28.6); g.linearRampToValueAtTime(0,t0+30);
+  // reverb
+  const conv = ac.createConvolver(); const len=ac.sampleRate*2.8; const ir=ac.createBuffer(2,len,ac.sampleRate);
+  for(let c=0;c<2;c++){const d=ir.getChannelData(c); for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/len,3);}
+  conv.buffer=ir; const wet=ac.createGain(); wet.gain.value=.4; conv.connect(wet).connect(master);
+  // delay
+  const dl=ac.createDelay(); dl.delayTime.value=.46875; const fb=ac.createGain(); fb.gain.value=.33; const dlf=ac.createBiquadFilter(); dlf.type='lowpass'; dlf.frequency.value=2500;
+  dl.connect(dlf).connect(fb).connect(dl); dlf.connect(master);
+  const hz=m=>440*Math.pow(2,(m-69)/12);
+  const beat=.625, bar=2.5;
+  const chords=[[53,57,60,64],[52,55,59,62],[50,53,57,60],[48,52,55,59]];
+  function pad(notes,t,d){
+    notes.forEach(n=>[-6,6].forEach(det=>{
+      const o=ac.createOscillator(); o.type='sawtooth'; o.frequency.value=hz(n); o.detune.value=det;
+      const f=ac.createBiquadFilter(); f.type='lowpass'; f.frequency.setValueAtTime(500,t); f.frequency.linearRampToValueAtTime(1100,t+d/2); f.frequency.linearRampToValueAtTime(600,t+d);
+      const e=ac.createGain(); e.gain.setValueAtTime(0,t); e.gain.linearRampToValueAtTime(.018,t+.7); e.gain.setValueAtTime(.018,t+d-.3); e.gain.linearRampToValueAtTime(0,t+d+.6);
+      o.connect(f).connect(e); e.connect(master); e.connect(conv); o.start(t); o.stop(t+d+.7);
+    }));
+  }
+  function pluck(n,t,v=.07){
+    const o=ac.createOscillator(); o.type='triangle'; o.frequency.value=hz(n);
+    const o2=ac.createOscillator(); o2.type='sine'; o2.frequency.value=hz(n+12);
+    const e=ac.createGain(); e.gain.setValueAtTime(0,t); e.gain.linearRampToValueAtTime(v,t+.006); e.gain.exponentialRampToValueAtTime(.0008,t+.45);
+    o.connect(e); o2.connect(e); e.connect(master); e.connect(dl); e.connect(conv); o.start(t); o2.start(t); o.stop(t+.5); o2.stop(t+.5);
+  }
+  function bass(n,t,d){
+    const o=ac.createOscillator(); o.type='sine'; o.frequency.value=hz(n);
+    const e=ac.createGain(); e.gain.setValueAtTime(0,t); e.gain.linearRampToValueAtTime(.22,t+.02); e.gain.exponentialRampToValueAtTime(.001,t+d);
+    o.connect(e).connect(master); o.start(t); o.stop(t+d+.05);
+  }
+  function kick(t){
+    const o=ac.createOscillator(); o.frequency.setValueAtTime(140,t); o.frequency.exponentialRampToValueAtTime(42,t+.18);
+    const e=ac.createGain(); e.gain.setValueAtTime(.55,t); e.gain.exponentialRampToValueAtTime(.001,t+.35);
+    o.connect(e).connect(master); o.start(t); o.stop(t+.4);
+  }
+  const nbuf=ac.createBuffer(1,ac.sampleRate,ac.sampleRate); const nd=nbuf.getChannelData(0); for(let i=0;i<nd.length;i++) nd[i]=Math.random()*2-1;
+  function noise(t,d,type,freq,v,sweepTo){
+    const s=ac.createBufferSource(); s.buffer=nbuf; const f=ac.createBiquadFilter(); f.type=type; f.frequency.setValueAtTime(freq,t);
+    if(sweepTo) f.frequency.exponentialRampToValueAtTime(sweepTo,t+d);
+    const e=ac.createGain(); e.gain.setValueAtTime(0,t); e.gain.linearRampToValueAtTime(v,t+(sweepTo?d*.8:.003)); e.gain.exponentialRampToValueAtTime(.0005,t+d);
+    s.connect(f).connect(e); e.connect(master); if(sweepTo) e.connect(conv); s.start(t); s.stop(t+d+.05);
+  }
+  function clink(t){ [2637,3951,5274].forEach((fq,i)=>{ const o=ac.createOscillator(); o.type='sine'; o.frequency.value=fq;
+    const e=ac.createGain(); e.gain.setValueAtTime(.09/(i+1),t); e.gain.exponentialRampToValueAtTime(.0005,t+1.2);
+    o.connect(e); e.connect(master); e.connect(conv); o.start(t); o.stop(t+1.3); }); noise(t,.5,'bandpass',900,.12,null); }
+  const arp=[0,1,2,3,2,1,3,2];
+  for(let b=0;b<12;b++){
+    const t=t0+b*bar, ch=chords[b%4];
+    pad(ch,t,bar);
+    if(b>=1 && b<11) arp.forEach((k,i)=>pluck(ch[k]+12,t+i*beat/2, i%2?.045:.07));
+    if(b>=2 && b<11){ bass(ch[0]-12,t,beat*1.4); bass(ch[0]-12,t+beat*2.5,beat*1.2); }
+    if(b>=2 && b<11 && b!==4){ kick(t); kick(t+beat*2); }
+    if(b>=5 && b<11) for(let i=0;i<4;i++) noise(t+i*beat+beat/2,.06,'highpass',8000,.05,null);
+  }
+  pluck(76,t0+28,.06); pluck(81,t0+28.3,.05); pluck(84,t0+28.6,.05);
+  clink(t0+1.0);
+  [4.35,8.85,12.3,18.3,23.8].forEach(s=>noise(t0+s-.4,.5,'bandpass',400,.09,5000)); // whooshes
+  return t0;
+}
+
+/* ---------- voice-over (brand slogan) ---------- */
+function speak(){
+  if(!('speechSynthesis' in window)) return;
+  const u=new SpeechSynthesisUtterance(CONFIG.slogan); u.lang='ko-KR'; u.rate=.86; u.pitch=1.12; u.volume=1;
+  const vs=speechSynthesis.getVoices().filter(v=>/ko/i.test(v.lang));
+  const pref=vs.find(v=>/SunHi|Heami|Yuna|female|여/i.test(v.name))||vs[0]; if(pref) u.voice=pref;
+  speechSynthesis.cancel(); speechSynthesis.speak(u);
+}
+speechSynthesis && speechSynthesis.getVoices();
+
+/* ---------- play ---------- */
+let timer;
+function play(){
+  document.getElementById('overlay').style.display='none';
+  gsap.set('#stage',{opacity:1});
+  if(ac) ac.close();
+  clearTimeout(timer);
+  startAudio();
+  tl.restart();
+  timer=setTimeout(speak,25200);
+  setTimeout(()=>{const o=document.getElementById('overlay'); o.querySelector('div:nth-child(2)').textContent='다시 보기'; o.style.display='flex';},30200);
+}
+document.getElementById('overlay').addEventListener('click',play);
+</script>
+</body>
+</html>
